@@ -3,9 +3,9 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { CheckCircle, Globe } from "lucide-react"
+import { Globe, FileText } from "lucide-react"
 import FloatingWebWindow from "@/components/floating-web-window"
+import FormFillingModal from "@/components/form-filling-modal"
 
 interface DemonstrateProcessProps {
   taskName: string
@@ -15,27 +15,29 @@ interface DemonstrateProcessProps {
 
 export default function DemonstrateProcess({ taskName, file, onComplete }: DemonstrateProcessProps) {
   const [isRecording, setIsRecording] = useState(true)
-  const [isSaved, setIsSaved] = useState(false)
   const [showWebWindow, setShowWebWindow] = useState(false)
+  const [showFormModal, setShowFormModal] = useState(false)
 
-  // Mock data that would come from the uploaded file (could be PDF content, webpage content, etc.)
+  // Mock data that would come from the uploaded file
   const fileData = [
     { title: "The Shawshank Redemption", year: "1994", genre: "Drama", rating: "" },
     { title: "The Godfather", year: "1972", genre: "Crime", rating: "" },
     { title: "Pulp Fiction", year: "1994", genre: "Crime", rating: "" },
     { title: "The Dark Knight", year: "2008", genre: "Action", rating: "" },
+    { title: "Forrest Gump", year: "1994", genre: "Drama", rating: "" },
+    { title: "Inception", year: "2010", genre: "Sci-Fi", rating: "" },
+    { title: "The Matrix", year: "1999", genre: "Sci-Fi", rating: "" },
+    { title: "Goodfellas", year: "1990", genre: "Crime", rating: "" },
   ]
-
-  const handleFinishDemo = () => {
-    setIsRecording(false)
-    setIsSaved(true)
-    setTimeout(() => {
-      onComplete()
-    }, 1500)
-  }
 
   const toggleWebWindow = () => {
     setShowWebWindow(!showWebWindow)
+  }
+
+  const handleFormComplete = () => {
+    setShowFormModal(false)
+    setIsRecording(false)
+    onComplete()
   }
 
   return (
@@ -52,133 +54,69 @@ export default function DemonstrateProcess({ taskName, file, onComplete }: Demon
         </div>
       )}
 
-      {isSaved && (
-        <div className="bg-green-50 border border-green-200 rounded-md p-2 mb-6 flex items-center justify-center">
-          <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-          <p className="text-green-700">Task saved successfully!</p>
-        </div>
-      )}
-
-      {/* Web Window Toggle Button */}
-      <div className="mb-4 flex justify-end">
-        <Button onClick={toggleWebWindow} variant="outline" size="sm">
+      {/* Action Buttons */}
+      <div className="mb-6 flex justify-center gap-4">
+        <Button onClick={toggleWebWindow} variant="outline">
           <Globe className="w-4 h-4 mr-2" />
           {showWebWindow ? "Hide Web Window" : "Open Web Window"}
         </Button>
-      </div>
-
-      <div className="flex flex-col lg:flex-row gap-4">
-        {/* Left side - Reference file content */}
-        <Card className="flex-1">
-          <CardContent className="p-4">
-            <h3 className="text-lg font-medium mb-4">Reference File Content</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    <th className="border p-2 bg-gray-100 text-left">Movie Title</th>
-                    <th className="border p-2 bg-gray-100 text-left">Year</th>
-                    <th className="border p-2 bg-gray-100 text-left">Genre</th>
-                    <th className="border p-2 bg-gray-100 text-left">Rating</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fileData.map((row, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="border p-2">{row.title}</td>
-                      <td className="border p-2">{row.year}</td>
-                      <td className="border p-2">{row.genre}</td>
-                      <td className="border p-2">{row.rating}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="mt-4 text-sm text-gray-500">
-              <p>File: {file?.name || "movie-list.pdf"}</p>
-              <p>Source: Uploaded reference document</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Right side - Target form/table */}
-        <Card className="flex-1">
-          <CardContent className="p-4">
-            <h3 className="text-lg font-medium mb-4">Target Table</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    <th className="border p-2 bg-gray-100 text-center">A</th>
-                    <th className="border p-2 bg-gray-100 text-center">B</th>
-                    <th className="border p-2 bg-gray-100 text-center">C</th>
-                    <th className="border p-2 bg-gray-100 text-center">D</th>
-                  </tr>
-                  <tr>
-                    <th className="border p-2 bg-gray-50">Title</th>
-                    <th className="border p-2 bg-gray-50">Year</th>
-                    <th className="border p-2 bg-gray-50">Genre</th>
-                    <th className="border p-2 bg-gray-50">My Rating</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border p-2">
-                      <Input placeholder="Movie title" className="border-0 p-1 h-8" />
-                    </td>
-                    <td className="border p-2">
-                      <Input placeholder="Year" className="border-0 p-1 h-8" />
-                    </td>
-                    <td className="border p-2">
-                      <Input placeholder="Genre" className="border-0 p-1 h-8" />
-                    </td>
-                    <td className="border p-2">
-                      <Input placeholder="Rating" className="border-0 p-1 h-8" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border p-2">
-                      <Input placeholder="Movie title" className="border-0 p-1 h-8" />
-                    </td>
-                    <td className="border p-2">
-                      <Input placeholder="Year" className="border-0 p-1 h-8" />
-                    </td>
-                    <td className="border p-2">
-                      <Input placeholder="Genre" className="border-0 p-1 h-8" />
-                    </td>
-                    <td className="border p-2">
-                      <Input placeholder="Rating" className="border-0 p-1 h-8" />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="border p-2">
-                      <Input placeholder="Movie title" className="border-0 p-1 h-8" />
-                    </td>
-                    <td className="border p-2">
-                      <Input placeholder="Year" className="border-0 p-1 h-8" />
-                    </td>
-                    <td className="border p-2">
-                      <Input placeholder="Genre" className="border-0 p-1 h-8" />
-                    </td>
-                    <td className="border p-2">
-                      <Input placeholder="Rating" className="border-0 p-1 h-8" />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="mt-6 flex justify-center">
-        <Button onClick={handleFinishDemo} size="lg" variant={isSaved ? "outline" : "default"} disabled={isSaved}>
-          {isSaved ? "Task Saved" : "Save Task"}
+        <Button onClick={() => setShowFormModal(true)} size="lg">
+          <FileText className="w-4 h-4 mr-2" />
+          Fill Form
         </Button>
       </div>
 
+      {/* Reference File Content */}
+      <Card className="max-w-5xl mx-auto">
+        <CardContent className="p-6">
+          <h3 className="text-xl font-medium mb-4 text-center">Reference File Content</h3>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4">
+            <p className="text-sm text-yellow-800">
+              💡 <strong>Tip:</strong> You can drag the form window to any position to view this reference content while
+              filling out the form.
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  <th className="border p-3 bg-gray-100 text-left">Movie Title</th>
+                  <th className="border p-3 bg-gray-100 text-left">Year</th>
+                  <th className="border p-3 bg-gray-100 text-left">Genre</th>
+                  <th className="border p-3 bg-gray-100 text-left">Rating</th>
+                </tr>
+              </thead>
+              <tbody>
+                {fileData.map((row, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="border p-3 font-medium">{row.title}</td>
+                    <td className="border p-3">{row.year}</td>
+                    <td className="border p-3">{row.genre}</td>
+                    <td className="border p-3 text-gray-400">{row.rating || "Not rated"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 text-sm text-gray-500 text-center">
+            <p>File: {file?.name || "movie-list.pdf"}</p>
+            <p>Source: Uploaded reference document</p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Floating Web Window */}
       {showWebWindow && <FloatingWebWindow onClose={() => setShowWebWindow(false)} />}
+
+      {/* Form Filling Modal */}
+      {showFormModal && (
+        <FormFillingModal
+          taskName={taskName}
+          onClose={() => setShowFormModal(false)}
+          onComplete={handleFormComplete}
+          isDemo={true}
+        />
+      )}
     </div>
   )
 }
